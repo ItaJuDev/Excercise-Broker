@@ -39,103 +39,133 @@ export default function CreateBrokerPage() {
   }
 
   return (
-    <div className="mx-auto max-w-xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Add a broker</h1>
-        <p className="text-sm text-slate-600">
-          Fill in the broker details. All fields are required.
+    <div className='space-y-8'>
+      <header>
+        <h1 className='font-display text-5xl font-bold text-white'>Submit Broker</h1>
+        <p className='mt-3 max-w-xl text-sm text-muted'>
+          Register a new institutional entity within the Sterling Midnight ecosystem.
+          Please ensure all data points align with regulatory documentation.
         </p>
-      </div>
+      </header>
 
-      <form onSubmit={onSubmit} className="space-y-4 rounded-lg border border-slate-200 bg-white p-6">
-        <Field label="Name" required>
-          <input
-            value={form.name}
-            onChange={(e) => update('name', e.target.value)}
-            required
-            className={inputCls}
-            placeholder="Exness"
-          />
+      <form onSubmit={onSubmit} className='panel space-y-6 p-8'>
+        <div className='grid gap-6 sm:grid-cols-2'>
+          <Field label='Broker Name'>
+            <input
+              value={form.name}
+              onChange={(e) => update('name', e.target.value)}
+              required
+              className={inputCls}
+              placeholder='e.g. Sterling Capital Markets'
+            />
+          </Field>
+          <Field label='Slug'>
+            <input
+              value={form.slug}
+              onChange={(e) => update('slug', e.target.value)}
+              required
+              pattern='^[a-z0-9]+(?:-[a-z0-9]+)*$'
+              className={inputCls}
+              placeholder='sterling-capital-markets'
+            />
+          </Field>
+        </div>
+
+        <Field label='Broker Type'>
+          <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
+            {BROKER_TYPES.map((t) => {
+              const active = form.broker_type === t;
+              return (
+                <button
+                  key={t}
+                  type='button'
+                  onClick={() => update('broker_type', t)}
+                  className={`rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-wider transition ${
+                    active
+                      ? 'bg-accent text-white shadow-glow'
+                      : 'border border-white/10 bg-ink-800/60 text-muted hover:text-white'
+                  }`}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
         </Field>
 
-        <Field label="Slug" required hint="lowercase letters, digits and hyphens">
-          <input
-            value={form.slug}
-            onChange={(e) => update('slug', e.target.value)}
-            required
-            pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
-            className={inputCls}
-            placeholder="exness-broker"
-          />
-        </Field>
+        <div className='grid gap-6 sm:grid-cols-2'>
+          <Field label='Logo URL'>
+            <InputWithIcon
+              icon={
+                <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                  <rect x='3' y='3' width='18' height='18' rx='2' />
+                  <circle cx='9' cy='9' r='2' />
+                  <path d='m21 15-5-5L5 21' />
+                </svg>
+              }
+            >
+              <input
+                type='url'
+                value={form.logo_url}
+                onChange={(e) => update('logo_url', e.target.value)}
+                required
+                className={inputCls + ' pl-9'}
+                placeholder='https://assets.sterling.com/logo.png'
+              />
+            </InputWithIcon>
+          </Field>
+          <Field label='Website'>
+            <InputWithIcon
+              icon={
+                <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                  <circle cx='12' cy='12' r='10' />
+                  <path d='M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20' />
+                </svg>
+              }
+            >
+              <input
+                type='url'
+                value={form.website}
+                onChange={(e) => update('website', e.target.value)}
+                required
+                className={inputCls + ' pl-9'}
+                placeholder='https://sterlingmidnight.com'
+              />
+            </InputWithIcon>
+          </Field>
+        </div>
 
-        <Field label="Description" required>
+        <Field label='Broker Description'>
           <textarea
             value={form.description}
             onChange={(e) => update('description', e.target.value)}
             required
-            rows={3}
+            rows={5}
             className={inputCls}
-            placeholder="A short description of the broker..."
+            placeholder='Provide a comprehensive institutional overview...'
           />
-        </Field>
-
-        <Field label="Logo URL" required>
-          <input
-            type="url"
-            value={form.logo_url}
-            onChange={(e) => update('logo_url', e.target.value)}
-            required
-            className={inputCls}
-            placeholder="https://example.com/logo.png"
-          />
-        </Field>
-
-        <Field label="Website" required>
-          <input
-            type="url"
-            value={form.website}
-            onChange={(e) => update('website', e.target.value)}
-            required
-            className={inputCls}
-            placeholder="https://example.com"
-          />
-        </Field>
-
-        <Field label="Broker type" required>
-          <select
-            value={form.broker_type}
-            onChange={(e) => update('broker_type', e.target.value as CreateBrokerInput['broker_type'])}
-            className={inputCls}
-          >
-            {BROKER_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t.toUpperCase()}
-              </option>
-            ))}
-          </select>
         </Field>
 
         {error && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          <div className='rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200'>
             {error}
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-2 pt-2">
+        <div className='flex items-center justify-end gap-4 pt-2'>
           <button
-            type="button"
+            type='button'
             onClick={() => router.push('/')}
-            className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50"
+            className='text-sm font-semibold text-muted transition hover:text-white'
           >
-            Cancel
+            Discard Draft
           </button>
           <button
-            type="submit"
+            type='submit'
             disabled={submitting}
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+            className='rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-hover disabled:opacity-50'
           >
-            {submitting ? 'Saving...' : 'Submit'}
+            {submitting ? 'Submitting...' : 'Submit Application'}
           </button>
         </div>
       </form>
@@ -144,26 +174,22 @@ export default function CreateBrokerPage() {
 }
 
 const inputCls =
-  'w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none';
+  'w-full rounded-lg border border-white/10 bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-muted/60 focus:border-accent focus:outline-none';
 
-function Field({
-  label,
-  required,
-  hint,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">
-        {label} {required && <span className="text-red-500">*</span>}
-      </span>
+    <label className='block'>
+      <span className='eyebrow mb-2 block'>{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-slate-500">{hint}</span>}
     </label>
+  );
+}
+
+function InputWithIcon({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className='relative'>
+      <span className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted'>{icon}</span>
+      {children}
+    </div>
   );
 }
