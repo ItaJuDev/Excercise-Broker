@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: broker
+      POSTGRES_PASSWORD: broker
+      POSTGRES_DB: broker
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U broker -d broker']
+      interval: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://broker:broker@db:5432/broker?schema=public
+      WEB_ORIGIN: http://localhost:3000
+      API_PORT: 3001
+    ports:
+      - '3001:3001'
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        API_URL_INTERNAL: http://api:3001/api
+    depends_on:
+      - api
+    environment:
+      API_URL_INTERNAL: http://api:3001/api
+    ports:
+      - '3000:3000'
+
+volumes:
+  pg_data:

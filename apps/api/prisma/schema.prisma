@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BrokerType {
+  cfd
+  bond
+  stock
+  crypto
+}
+
+model Broker {
+  id          Int        @id @default(autoincrement())
+  name        String
+  slug        String     @unique
+  description String
+  logo_url    String
+  website     String
+  broker_type BrokerType
+  created_at  DateTime   @default(now())
+
+  @@index([broker_type])
+  @@index([name])
+}
